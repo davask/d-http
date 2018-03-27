@@ -5,6 +5,7 @@ services:
     ports:
       - 42022:22/tcp
       - 42020:80/tcp
+      - 42024:9999/tcp
     env_file: .env
     environment:
       COMPOSE_PROJECT_NAME: container_name
