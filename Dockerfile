@@ -1,4 +1,4 @@
-FROM davask/d-base:d9.x
+FROM davask/d-http:a2.4-d9.x
 
 MAINTAINER davask <docker@davaskweblimited.com>
 USER root
@@ -13,6 +13,14 @@ ENV APACHE_RUN_DIR /var/run/apache2
 ENV DWL_HTTP_SERVERADMIN docker@davaskweblimited.com
 ENV DWL_HTTP_DOCUMENTROOT /var/www/html
 ENV DWL_HTTP_SHIELD false
+
+# declare openssl
+ENV APACHE_SSL_DIR ${CONF_HTTP_SSL_DIR}
+ENV DWL_SSLKEY_C "EU"
+ENV DWL_SSLKEY_ST "France"
+ENV DWL_SSLKEY_L "Vannes"
+ENV DWL_SSLKEY_O "davask web limited - docker container"
+ENV DWL_SSLKEY_CN "davaskweblimited.com"
 
 # Update packages
 RUN apt-get update && \
@@ -61,5 +69,24 @@ COPY ./build/dwl/vhost-env.sh \
 
 CMD ["/bin/bash /dwl/init.sh"]
 
+# create apache2 ssl directories
+RUN mkdir -p ${APACHE_SSL_DIR}
+RUN chmod 700 ${APACHE_SSL_DIR}
+
+RUN rm -f /etc/apache2/sites-enabled/default-ssl.conf &>> null
+RUN rm -f /etc/apache2/sites-available/default-ssl.conf &>> null
+
+COPY ./build/dwl/etc/apache2/mods-available/ssl.conf /etc/apache2/mods-available/ssl.conf
+RUN a2enmod ssl
+
+# Configure apache virtualhost.conf
+COPY ./build/dwl/etc/apache2/sites-available/0000_docker.davaskweblimited.com_443.conf.dwl /dwl/etc/apache2/sites-available/0000_docker.davaskweblimited.com_443.conf.dwl
+
+EXPOSE 443
+
+COPY ./build/dwl/openssl.sh \
+./build/dwl/virtualhost-ssl.sh \
+./build/dwl/init.sh \
+/dwl/
 RUN chmod +x /dwl/init.sh && chown root:sudo -R /dwl
 USER admin
