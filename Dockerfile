@@ -40,7 +40,7 @@ COPY ./build/dwl/etc/apache2/sites-available /dwl/etc/apache2/sites-available
 RUN a2dissite 000-default default-ssl && \
 mv /etc/apache2/sites-available/000-default.conf /dwl/etc/apache2/sites-available/0000X_default_80.conf && \
 mv /etc/apache2/sites-available/default-ssl.conf /dwl/etc/apache2/sites-available/0000X_default-ssl_443.conf
-COPY ./build/dwl/var/www/html /dwl/var/www
+COPY ./build/dwl/var/www/html /dwl/var/www/html
 
 EXPOSE 80
 

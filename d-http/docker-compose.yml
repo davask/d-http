@@ -11,7 +11,7 @@ services:
       DWL_LOCAL_LANG: 'en_US:en'
       DWL_LOCAL: 'en_US.UTF-8'
       DWL_USER_ID: 1000
-      DWL_HTTP_DOCUMENTROOT: /var/www
+      DWL_HTTP_DOCUMENTROOT: /var/www/html
       # DWL_USER_NAME host
       # DWL_USER_PASSWD secretpassword
       # DWL_SSH_ACCESS false
