@@ -18,6 +18,7 @@ services:
       # DWL_SUDO_USER false
       # DWL_HTTP_SERVERADMIN admin@localhost
       # DWL_HTTP_SHIELD false
+      # DWL_APACHEGUI false
     tty: true
     stdin_open: true
     hostname: localhost
@@ -26,5 +27,7 @@ services:
       - ../volumes/home/host:/home/davask
       - ../volumes/etc/apache2/sites-available:/etc/apache2/sites-available
 
+volumes:
+  apache2:
 # docker network create -d bridge --subnet 192.168.0.0/24 --gateway 192.168.0.1 dwlhost
 # docker-compose -f /home/$(whoami)/docker-images/images/http/d-http/d-http/docker-compose.yml up -d

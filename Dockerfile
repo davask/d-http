@@ -14,10 +14,12 @@ ENV APACHE_RUN_DIR /var/run/apache2
 ENV DWL_HTTP_SERVERADMIN admin@localhost
 ENV DWL_HTTP_DOCUMENTROOT /var/www/html
 ENV DWL_HTTP_SHIELD false
+ENV DWL_APACHEGUI false
 
 # Update packages
 RUN apt-get update && \
 apt-get install -y apache2 apache2-utils
+RUN apt-get install -y default-jre
 RUN apt-get upgrade -y && \
 apt-get autoremove -y && \
 apt-get clean && \
@@ -43,6 +45,10 @@ mv /etc/apache2/sites-available/default-ssl.conf /dwl/etc/apache2/sites-availabl
 COPY ./build/dwl/var/www/html /dwl/var/www/html
 
 EXPOSE 80
+
+RUN wget https://github.com/jrossi227/ApacheGUI/releases/download/v1.12.0/ApacheGUI-1.12.0.tar.gz -P /tmp && \
+tar -xvf /tmp/ApacheGUI-1.12.0.tar.gz -C /opt/ && \
+rm -rdf /tmp/ApacheGUI-1.12.0.tar.gz
 
 HEALTHCHECK --interval=5m --timeout=3s --retries=3 \
 CMD curl -f http://localhost:80 || exit 1
