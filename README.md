@@ -1,1 +1,1 @@
-davask/d-http:a2.4~openssl-d9.x
+davask/d-http:a2.4-d9.x
