@@ -1,0 +1,4 @@
+AuthType Basic
+AuthName "[dwl] protected"
+AuthUserFile /dwl/shield/.htpasswd
+Require valid-user

@@ -1,7 +1,8 @@
-FROM davask/d-base:d9.x
-
+FROM davask/d-base:d8.x
 MAINTAINER davask <docker@davaskweblimited.com>
 USER root
+LABEL dwl.server.http="apache 2.4-d8.x"
+
 # Apache conf
 ENV APACHE_LOCK_DIR /var/lock/apache2
 ENV APACHE_PID_FILE /var/run/apache2.pid
@@ -10,7 +11,7 @@ ENV APACHE_RUN_GROUP www-data
 ENV APACHE_LOG_DIR /var/log/apache2
 ENV APACHE_RUN_DIR /var/run/apache2
 
-ENV DWL_HTTP_SERVERADMIN docker@davaskweblimited.com
+ENV DWL_HTTP_SERVERADMIN admin@localhost
 ENV DWL_HTTP_DOCUMENTROOT /var/www/html
 ENV DWL_HTTP_SHIELD false
 
@@ -28,34 +29,27 @@ rewrite \
 expires \
 headers
 
-COPY ./build/dwl/etc/apache2/apache2.conf /dwl/etc/apache2/apache2.conf
-RUN cp -rdf /dwl/etc/apache2/apache2.conf /etc/apache2/apache2.conf
+COPY ./build/etc/apache2/apache2.conf /etc/apache2/apache2.conf
 RUN a2enmod cgi
 
 # proxy protection
 RUN a2enmod remoteip
 
-RUN a2dissite 000-default && rm -f /etc/apache2/sites-available/000-default.conf
-RUN a2dissite default-ssl && rm -f /etc/apache2/sites-available/default-ssl.conf
-
 # Configure apache virtualhost.conf
 COPY ./build/dwl/etc/apache2/sites-available /dwl/etc/apache2/
-COPY ./build/dwl/shield/var/www/html/.htaccess /dwl/shield/var/www/html/.htaccess
+RUN a2dissite 000-default default-ssl && \
+mv /etc/apache2/sites-available/000-default.conf /dwl/etc/apache2/sites-available/0000X_default_80.conf && \
+mv /etc/apache2/sites-available/default-ssl.conf /dwl/etc/apache2/sites-available/0000X_default-ssl_443.conf
+COPY ./build/dwl/var/www/html /dwl/var/www
 
 EXPOSE 80
 
 HEALTHCHECK --interval=5m --timeout=3s \
-CMD curl -f http://localhost/ || exit 1
-
-COPY ./build/dwl/var/www/html /dwl/var/www/html
-RUN rm -rdf /var/www/html && cp -rdf /dwl/var/www/html /var/www
+CMD curl -f http://127.0.0.1/ || exit 1
 
 WORKDIR /var/www
 
-COPY ./build/dwl/vhost-env.sh \
-./build/dwl/activateconf.sh \
-./build/dwl/virtualhost.sh \
-./build/dwl/apache2.sh \
+COPY ./build/dwl/apache2.sh \
 ./build/dwl/init.sh \
 /dwl/
 
