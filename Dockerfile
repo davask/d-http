@@ -36,7 +36,7 @@ RUN a2enmod cgi
 RUN a2enmod remoteip
 
 # Configure apache virtualhost.conf
-COPY ./build/dwl/etc/apache2/sites-available /dwl/etc/apache2/
+COPY ./build/dwl/etc/apache2/sites-available /dwl/etc/apache2/sites-available
 RUN a2dissite 000-default default-ssl && \
 mv /etc/apache2/sites-available/000-default.conf /dwl/etc/apache2/sites-available/0000X_default_80.conf && \
 mv /etc/apache2/sites-available/default-ssl.conf /dwl/etc/apache2/sites-available/0000X_default-ssl_443.conf
@@ -44,8 +44,8 @@ COPY ./build/dwl/var/www/html /dwl/var/www
 
 EXPOSE 80
 
-HEALTHCHECK --interval=5m --timeout=3s \
-CMD curl -f http://127.0.0.1/ || exit 1
+HEALTHCHECK --interval=5m --timeout=3s --retries=3 \
+CMD curl -f http://localhost:80 || exit 1
 
 WORKDIR /var/www
 

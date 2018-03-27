@@ -3,33 +3,28 @@ version: "3"
 services:
   app:
     ports:
-      - 42002:22/tcp
-      - 42000:80/tcp
+      - 42022:22/tcp
+      - 42020:80/tcp
+    env_file: .env
     environment:
       COMPOSE_PROJECT_NAME: container_name
       DWL_LOCAL_LANG: 'en_US:en'
       DWL_LOCAL: 'en_US.UTF-8'
-      DWL_USER_NAME: 'username'
-      DWL_USER_PASSWD: 'secret'
-      DWL_USER_ID: '1000'
-      DWL_SSH_ACCESS: 'false'
-      DWL_HTTP_SERVERADMIN: 'admin@localhost'
-      DWL_HTTP_DOCUMENTROOT: '/var/www'
-      DWL_HTTP_SHIELD: 'false'
+      DWL_USER_ID: 1000
+      DWL_HTTP_DOCUMENTROOT: /var/www
+      # DWL_USER_NAME host
+      # DWL_USER_PASSWD secretpassword
+      # DWL_SSH_ACCESS false
+      # DWL_SUDO_USER false
+      # DWL_HTTP_SERVERADMIN admin@localhost
+      # DWL_HTTP_SHIELD false
     tty: true
     stdin_open: true
     hostname: localhost
     image: davask/d-http:a2.4-d8.x
     volumes:
-      - ../volumes/home/host:/home/host
+      - ../volumes/home/host:/home/davask
       - ../volumes/etc/apache2/sites-available:/etc/apache2/sites-available
 
-networks:
-    dwlhost:
-        external: true
-
 # docker network create -d bridge --subnet 192.168.0.0/24 --gateway 192.168.0.1 dwlhost
-# export COMPOSE_HTTP_TIMEOUT=600;
-# docker exec -ti proxy_reverse_1 sh -c 'bash /dwl/init.sh'
-# docker-compose -f /home/dwl/docker-images/http/d-apache/docker-compose.yml up -d
-# docker exec -ti  sh -c 'mysqldump -u root -p  > /docker-entrypoint-initdb.d/-171219-083853.sql'
+# docker-compose -f /home/$(whoami)/docker-images/images/http/d-http/d-http/docker-compose.yml up -d
