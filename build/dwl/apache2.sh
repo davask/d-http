@@ -2,25 +2,42 @@
 
 if [ ! -d /home/${DWL_USER_NAME}/files ]; then
     sudo mkdir -p /home/${DWL_USER_NAME}/files;
-    sudo cp /dwl/var/www/html/index.html /home/${DWL_USER_NAME}/files/index.html
 fi
-if [ -d /home/${DWL_USER_NAME}/files ]; then
-    sudo rm -rdf ${DWL_HTTP_DOCUMENTROOT:-/var/www/html};
-    sudo ln -sf /home/${DWL_USER_NAME}/files ${DWL_HTTP_DOCUMENTROOT:-/var/www/html};
+if [ -d /var/www/html ]; then
+    sudo rm -rdf /var/www/html;
+fi
+if [ -d /home/${DWL_USER_NAME}/files ] && [ ! -d /var/www/html ]; then
+    sudo ln -sf /home/${DWL_USER_NAME}/files /var/www/html;
+}
+if [ ! -d ${DWL_HTTP_DOCUMENTROOT} ]; then
+    mkdir ${DWL_HTTP_DOCUMENTROOT};
+fi
+if [ ! -f ${DWL_HTTP_DOCUMENTROOT}/index.html ]; then
+    sudo cp /dwl/var/www/html/index.html ${DWL_HTTP_DOCUMENTROOT}/index.html
 fi
 
-if [ "$DWL_SHIELD_HTTP" == "true" ]; then
+if [ "${DWL_SHIELD_HTTP}" == "true" ]; then
     DWL_APACHE2_SHIELD="/dwl/shield";
-    echo "Generate htpasswd with htpasswd -b -c '$DWL_APACHE2_SHIELD/.htpasswd $DWL_USER_NAME $DWL_USER_PASSWD'";
-    if [ ! -d $DWL_APACHE2_SHIELD ]; then
-        sudo mkdir -p $DWL_APACHE2_SHIELD;
+    echo "Generate htpasswd with htpasswd -b -c '${DWL_APACHE2_SHIELD}/.htpasswd $DWL_USER_NAME $DWL_USER_PASSWD'";
+    if [ ! -d ${DWL_APACHE2_SHIELD} ]; then
+        sudo mkdir -p ${DWL_APACHE2_SHIELD};
     fi
-    htpasswd -b -c $DWL_APACHE2_SHIELD/.htpasswd $DWL_USER_NAME $DWL_USER_PASSWD;
+    sudo htpasswd -b -c ${DWL_APACHE2_SHIELD}/.htpasswd $DWL_USER_NAME $DWL_USER_PASSWD;
     if [ ! -f /etc/apache2/sites-available/0000X_override.rules_0.conf ]; then
         sudo cp /dwl/etc/apache2/sites-available/0000X_override.rules_0.conf /etc/apache2/sites-available/0000X_override.rules_0.conf;
     fi
-    if [ ! -f /home/${DWL_USER_NAME}/files/.htaccess ]; then
-        sudo cp /dwl/var/www/html/.htaccess /home/${DWL_USER_NAME}/files/.htaccess
+    if [ -f ${DWL_HTTP_DOCUMENTROOT}/.htaccess ]; then
+        if [ "$(cat ${DWL_HTTP_DOCUMENTROOT}/.htaccess | grep "AuthType" | wc -l)" == "0" ]; then
+            echo -e "
+AuthType Basic
+AuthName \"[dwl] protected\"
+AuthUserFile /dwl/shield/.htpasswd
+Require valid-user
+" >> ${DWL_HTTP_DOCUMENTROOT}/.htaccess;
+        fi
+    else
+        sudo cp /dwl/var/www/html/.htaccess ${DWL_HTTP_DOCUMENTROOT}/.htaccess;
+    fi
     fi
 fi
 

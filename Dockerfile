@@ -20,9 +20,7 @@ ENV DWL_APACHEGUI false
 RUN apt-get update && \
 apt-get install -y apache2 apache2-utils
 RUN apt-get install -y default-jre
-RUN apt-get upgrade -y && \
-apt-get autoremove -y && \
-apt-get clean && \
+RUN apt-get clean && \
 rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 # Configure apache
