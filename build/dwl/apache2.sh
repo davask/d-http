@@ -8,7 +8,7 @@ if [ -d /var/www/html ]; then
 fi
 if [ -d /home/${DWL_USER_NAME}/files ] && [ ! -d /var/www/html ]; then
     sudo ln -sf /home/${DWL_USER_NAME}/files /var/www/html;
-}
+fi
 if [ ! -d ${DWL_HTTP_DOCUMENTROOT} ]; then
     mkdir ${DWL_HTTP_DOCUMENTROOT};
 fi
@@ -37,7 +37,6 @@ Require valid-user
         fi
     else
         sudo cp /dwl/var/www/html/.htaccess ${DWL_HTTP_DOCUMENTROOT}/.htaccess;
-    fi
     fi
 fi
 
